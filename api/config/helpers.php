@@ -66,7 +66,12 @@ loadEnv();
  * Handles preflight OPTIONS requests by exiting with 200 OK.
  */
 function setCORSHeaders() {
-    header("Access-Control-Allow-Origin: *");
+    $allowedOrigins = ['https://disc.quest', 'http://localhost', 'http://127.0.0.1'];
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    if (in_array($origin, $allowedOrigins, true)) {
+        header("Access-Control-Allow-Origin: $origin");
+        header('Vary: Origin');
+    }
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-User-Id");
 
