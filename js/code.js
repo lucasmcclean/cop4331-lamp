@@ -165,6 +165,7 @@ function addAccount() {
           newPasswordInput.value = "";
           newFirstNameInput.value = "";
           newLastNameInput.value = "";
+          setTimeout(function () { window.location.href = "SignIn.html"; }, 1500);
           //searchColor();
         } else {
           try {
