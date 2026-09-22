@@ -37,9 +37,10 @@ function getDB() {
         try {
             $db = new PDO($dsn, $user, $pass, $options);
         } catch (PDOException $e) {
+            error_log('DB connection error: ' . $e->getMessage());
             http_response_code(500);
             header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['error' => 'Database connection error: ' . $e->getMessage()]);
+            echo json_encode(['error' => 'Database connection error']);
             exit;
         }
     }
