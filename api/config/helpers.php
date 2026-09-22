@@ -96,13 +96,22 @@ function respond($statusCode, $data) {
  */
 function getRequestBody() {
     $rawInput = file_get_contents('php://input');
+
     if (!empty($rawInput)) {
         $decoded = json_decode($rawInput, true);
         if (is_array($decoded)) {
             return $decoded;
         }
+        error_log('getRequestBody: invalid JSON: ' . substr($rawInput, 0, 200));
     }
-    return $_POST ?? [];
+
+    if (!empty($_POST)) {
+        return $_POST;
+    }
+
+    error_log('getRequestBody: empty body. raw=' . var_export($rawInput, true) . ' post=' . var_export($_POST, true));
+
+    return [];
 }
 
 /**
