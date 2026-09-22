@@ -101,7 +101,8 @@ function readCookie() {
   } else {
     let userNameEl = document.getElementById("userName");
     if (userNameEl) {
-      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-white">${firstName} ${lastName}</strong></span>`;
+      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-white"></strong></span>`;
+      userNameEl.querySelector("strong").textContent = firstName + " " + lastName;
     }
   }
 }
