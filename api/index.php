@@ -112,9 +112,10 @@ if ($method === 'POST' && $action === 'register') {
             'id'      => (int) $db->lastInsertId(),
             'message' => 'User registered successfully',
         ]);
-    } catch (PDOException $e) {
-        respond(500, ['error' => 'Database error: ' . $e->getMessage()]);
-    }
+} catch (PDOException $e) {
+            error_log('DB error: ' . $e->getMessage());
+            respond(500, ['error' => 'Database error']);
+        }
 }
 
 // Everything BELOW this point requires authentication
@@ -125,6 +126,7 @@ switch ($method) {
     // ── GET: search for contact ──────────────────
     case 'GET':
         $search = $_GET['q'] ?? '';
+        $search = str_replace(['%', '_'], ['\\%', '\\_'], $search);
         $like = '%' . $search . '%';
 
         try {
@@ -151,7 +153,8 @@ switch ($method) {
 
             respond(200, ['contacts' => $contacts]);
         } catch (PDOException $e) {
-            respond(500, ['error' => 'Database error: ' . $e->getMessage()]);
+            error_log('DB error: ' . $e->getMessage());
+        respond(500, ['error' => 'Database error']);
         }
 
         break;
@@ -215,7 +218,8 @@ switch ($method) {
                 'message' => 'Contact created successfully'
             ]);
         } catch (PDOException $e) {
-            respond(500, ['error' => 'Database error: ' . $e->getMessage()]);
+            error_log('DB error: ' . $e->getMessage());
+        respond(500, ['error' => 'Database error']);
         }
 
         break;
