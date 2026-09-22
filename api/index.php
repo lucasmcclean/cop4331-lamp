@@ -35,25 +35,24 @@ if ($method === 'POST' && $action === 'login') {
     }
 
     $login    = clean($body['login']);
-    $password = clean($body['password']);
+    $password = $body['password'];
 
     if (!$login || !$password) {
         respond(400, ['error' => 'Login and password are required']);
     }
 
-    $stmt = $db->prepare('SELECT ID, `First Name` AS firstName, `Last Name` AS lastName 
+    $stmt = $db->prepare('SELECT ID, Password, `First Name` AS firstName, `Last Name` AS lastName 
                           FROM Users 
-                          WHERE Login = :login AND Password = :pass 
+                          WHERE Login = :login 
                           LIMIT 1');
 
     $stmt->execute([
-        ':login' => $login,
-        ':pass'  => $password
+        ':login' => $login
     ]);
 
     $user = $stmt->fetch();
 
-    if ($user) {
+    if ($user && password_verify($password, $user['Password'])) {
         respond(200, [
             'id'        => (int) $user['ID'],
             'firstName' => $user['firstName'],
@@ -79,7 +78,7 @@ if ($method === 'POST' && $action === 'register') {
     }
 
     $login     = clean($body['login']);
-    $password  = clean($body['password']);
+    $password  = $body['password'];
     $firstName = clean($body['firstName']);
     $lastName  = clean($body['lastName']);
 
@@ -95,14 +94,16 @@ if ($method === 'POST' && $action === 'register') {
         respond(409, ['error' => 'Login already exists']);
     }
 
-    // Insert new user
+    // Insert new user (`password_hash` uses bcrypt which already includes salt)
+    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
     $stmt = $db->prepare('INSERT INTO Users (Login, Password, `First Name`, `Last Name`) 
                           VALUES (:login, :pass, :firstName, :lastName)');
 
     try {
         $stmt->execute([
             ':login'     => $login,
-            ':pass'      => $password,
+            ':pass'      => $passwordHash,
             ':firstName' => $firstName,
             ':lastName'  => $lastName
         ]);
