@@ -1,0 +1,53 @@
+.background-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(13, 110, 253, 0.15), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(111, 66, 193, 0.15), transparent 45%);
+}
+
+.glass-card {
+  background: rgba(33, 37, 41, 0.65);
+  backdrop-filter: blur(10px);
+}
+
+.app-icon-wrapper,
+.app-icon-wrapper-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0d6efd, #6f42c1);
+  color: #fff;
+  border-radius: 1rem;
+}
+
+.app-icon-wrapper {
+  width: 72px;
+  height: 72px;
+  font-size: 2rem;
+}
+
+.app-icon-wrapper-sm {
+  width: 44px;
+  height: 44px;
+  font-size: 1.25rem;
+}
+
+.section-card {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-secondary-contrast,
+.form-label-contrast {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.text-success-wcag {
+  color: #198754;
+}
+
+.text-danger-wcag {
+  color: #dc3545;
+}
