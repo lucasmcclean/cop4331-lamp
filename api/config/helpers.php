@@ -66,12 +66,7 @@ loadEnv();
  * Handles preflight OPTIONS requests by exiting with 200 OK.
  */
 function setCORSHeaders() {
-    $allowedOrigins = ['https://disc.quest', 'http://localhost', 'http://127.0.0.1'];
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    if (in_array($origin, $allowedOrigins, true)) {
-        header("Access-Control-Allow-Origin: $origin");
-        header('Vary: Origin');
-    }
+    header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-User-Id");
 
@@ -101,22 +96,13 @@ function respond($statusCode, $data) {
  */
 function getRequestBody() {
     $rawInput = file_get_contents('php://input');
-
     if (!empty($rawInput)) {
         $decoded = json_decode($rawInput, true);
         if (is_array($decoded)) {
             return $decoded;
         }
-        error_log('getRequestBody: invalid JSON: ' . substr($rawInput, 0, 200));
     }
-
-    if (!empty($_POST)) {
-        return $_POST;
-    }
-
-    error_log('getRequestBody: empty body. raw=' . var_export($rawInput, true) . ' post=' . var_export($_POST, true));
-
-    return [];
+    return $_POST ?? [];
 }
 
 /**
@@ -142,75 +128,55 @@ function clean($data) {
 function requireAuth() {
     $userId = null;
 
-    // 1. Check Authorization Header (Bearer token, raw ID, or JWT)
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] 
-        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] 
+    // 1. Check Authorization header (raw numeric token)
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION']
+        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
         ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? null) : null);
 
     if ($authHeader) {
         $token = trim(preg_replace('/^Bearer\s+/i', '', $authHeader));
-        if (is_numeric($token) && (int)$token > 0) {
-            $userId = (int)$token;
-        } else {
-            // Check if JWT payload contains userId, user_id, or sub
-            $parts = explode('.', $token);
-            if (count($parts) === 3) {
-                $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
-                if (is_array($payload)) {
-                    $userId = $payload['userId'] ?? $payload['user_id'] ?? $payload['id'] ?? $payload['sub'] ?? null;
-                }
-            }
+        if (is_numeric($token) && (int) $token > 0) {
+            $userId = (int) $token;
         }
     }
 
-    // 2. Check X-User-Id or User-Id custom HTTP header
+    // 2. Check X-User-Id or User-Id custom header
     if (!$userId) {
         $xUserId = $_SERVER['HTTP_X_USER_ID'] ?? $_SERVER['HTTP_USER_ID'] ?? null;
-        if ($xUserId && is_numeric($xUserId) && (int)$xUserId > 0) {
-            $userId = (int)$xUserId;
+        if ($xUserId && is_numeric($xUserId) && (int) $xUserId > 0) {
+            $userId = (int) $xUserId;
         }
     }
 
-    // 3. Check Cookie (userId or user_id)
-    if (!$userId && isset($_COOKIE['userId']) && is_numeric($_COOKIE['userId'])) {
-        $userId = (int)$_COOKIE['userId'];
-    } elseif (!$userId && isset($_COOKIE['user_id']) && is_numeric($_COOKIE['user_id'])) {
-        $userId = (int)$_COOKIE['user_id'];
-    }
-
-    // 4. Check Session
-    if (!$userId) {
-        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
-            @session_start();
-        }
-        if (isset($_SESSION['userId']) && is_numeric($_SESSION['userId'])) {
-            $userId = (int)$_SESSION['userId'];
-        } elseif (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id'])) {
-            $userId = (int)$_SESSION['user_id'];
-        }
-    }
-
-    // 5. Check Query Parameters (?userId= or ?user_id= or ?uid=)
-    if (!$userId) {
-        $qUserId = $_GET['userId'] ?? $_GET['user_id'] ?? $_GET['uid'] ?? null;
-        if ($qUserId && is_numeric($qUserId) && (int)$qUserId > 0) {
-            $userId = (int)$qUserId;
-        }
-    }
-
-    // 6. Check Request Body (userId or user_id)
-    if (!$userId) {
-        $body = getRequestBody();
-        $bUserId = $body['userId'] ?? $body['user_id'] ?? $body['uid'] ?? null;
-        if ($bUserId && is_numeric($bUserId) && (int)$bUserId > 0) {
-            $userId = (int)$bUserId;
-        }
-    }
-
-    // If still no valid numeric user ID, deny access with 401 Unauthorized
-    if (!$userId || (int)$userId <= 0) {
+    if (!$userId || (int) $userId <= 0) {
         respond(401, ['error' => 'Unauthorized']);
     }
 
-    return (int)$userId;
+    return (int) $userId;
+}
+
+// 7. check name format
+function checkName($name) {
+    if (!$name || !is_string($name) || trim($name) === '') {
+        respond(400, ['error' => 'Invalid name']);
+    }
+    return trim($name);
+}
+
+// 8. check email format
+
+function checkEmail($email) {
+    if (!$email || !is_string($email) || trim($email) === '' || !filter_var(trim($email), FILTER_VALIDATE_EMAIL)) 
+    {
+        respond(400, ['error' => 'Invalid email address']);
+    }
+    return trim($email);
+}
+
+// 9. check phone number format
+function checkPhoneNumber($phoneNumber) {
+    if (!$phoneNumber || !is_string($phoneNumber) || trim($phoneNumber) === '' || !preg_match('/^\+?[0-9]{10}$/', trim($phoneNumber))) {
+        respond(400, ['error' => 'Invalid phone number, must be 10 digits.']);
+    }
+    return trim($phoneNumber);
 }
