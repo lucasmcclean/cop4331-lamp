@@ -1,4 +1,4 @@
-﻿const urlBase =
+const urlBase =
     typeof window !== "undefined" &&
         window.location &&
         (window.location.hostname === "localhost" ||
@@ -333,22 +333,20 @@ function searchContacts() {
                     let phoneNumber = c.phoneNumber;
 
                     contactList += `<span class="badge bg-cream text-success border border-success px-3 py-2 fs-6 shadow-sm d-inline-flex align-items-center me-2 mb-2" style="border-radius: 0;">
-    <span class="me-2">${firstName}</span>
-    <span class="me-2">${lastName}</span>
-    <span class="me-2">${email}</span>
-    <span class="me-2">${phoneNumber}</span>
-    <button type="button" class="btn" style="color: #2f6b3f;" onclick="deleteContact(${contactId});" title="Delete Contact"><i class="bi bi-trash3-fill"></i></button>
-    <button type="button" class="btn" style="color: #2f6b3f;" onclick='updateContact(
+                    <span class="me-2">${firstName}</span>
+                    <span class="me-2">${lastName}</span>
+                    <span class="me-2">${email}</span>
+                    <span class="me-2">${phoneNumber}</span>
+                    <button type="button" class="btn" style="color: #2f6b3f;" onclick="deleteContact(${contactId});" title="Delete Contact"><i class="bi bi-trash3-fill"></i></button>
+                    <button type="button" class="btn" style="color: #2f6b3f;" onclick='updateContact(
                 ${JSON.stringify(contactId)},
                 ${JSON.stringify(firstName)},
                 ${JSON.stringify(lastName)},
                 ${JSON.stringify(email)},
                 ${JSON.stringify(phoneNumber)}
             );'
-            title="Update Contact">
-        <i class="bi bi-person-up"></i>
-    </button>
-</span>`;
+            title="Update Contact"><i class="bi bi-person-up"></i></button>
+                    </span>`;
 
 
 
@@ -518,12 +516,12 @@ function searchUsers() {
                     let enabled = u.enabled;
 
                     userList += `<span class="badge bg-cream text-success border border-success px-3 py-2 fs-6 shadow-sm d-inline-flex align-items-center me-2 mb-2" style="border-radius: 0;">
-    <span class="me-2">${firstName}</span>
-    <span class="me-2">${lastName}</span>
-    <span class="me-2">${login}</span>
-    <span class="me-2">Admin: ${admin}</span>
-    <span class="me-2">Enabled: ${enabled}</span>
-</span>`;
+                    <span class="me-2">${firstName}</span>
+                    <span class="me-2">${lastName}</span>
+                    <span class="me-2">${login}</span>
+                    <span class="me-2">Admin: ${admin}</span>
+                    <span class="me-2">Enabled: ${enabled}</span>
+                    </span>`;
 
                 }
 
@@ -537,109 +535,3 @@ function searchUsers() {
         resultSpan.innerHTML = err.message;
     }
 }
-root@cop4331:~# cat /var/www/html/SignUp.html
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacts Manager - Sign Up</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5.3 & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Custom Styles -->
-    <link href="css/styles.css" rel="stylesheet">
-    <!-- Scripts -->
-    <script type="text/javascript" src="js/code.js"></script>
-</head>
-<body class="d-flex align-items-center justify-content-center min-vh-100 py-5">
-    <div class="background-glow"></div>
-    <main class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-10 col-md-8 col-lg-5">
-
-                <!-- Title Header -->
-                <div class="text-center mb-4">
-                    <div class="app-icon-wrapper mb-3 mx-auto">
-                        <i class="bi bi-person-add"></i>
-                    </div>
-                    <h1 id="title" class="fw-bold tracking-tight">Create New Account</h1>
-                </div>
-
-                <!--Login Section-->
-                <div id="loginDiv" class="card glass-card shadow-lg border-0 p-4 p-sm-5">
-                    <div class="card-body p-0">
-                        <span id="inner-title" class="d-block text-center fw-semibold text-uppercase tracking-wider mb-4 fs-5" style="color: #14532d;">Please enter credentials for your new account:</span>
-
-                        <form id="loginForm" onsubmit="event.preventDefault(); addAccount();" class="needs-validation">
-
-
-                            <!--First name entry section-->
-                            <div class="mb-3">
-                                <label for="newFirstName" class="form-label form-label-contrast small">First Name:</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-file-person text-secondary-contrast"></i></span>
-                                    <input type="text" id="newFirstName" class="form-control" placeholder="Enter first name" required />
-                                </div>
-                            </div>
-
-                            <!--Last name entry section-->
-                            <div class="mb-4">
-                                <label for="newLastName" class="form-label form-label-contrast small">Last Name:</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-file-person-fill text-secondary-contrast"></i></span>
-                                    <input type="text" id="newLastName" class="form-control" placeholder="Enter last name" required />
-                                </div>
-                            </div>
-
-                            <!--Login entry section-->
-                            <div class="mb-3">
-                                <label for="newLogin" class="form-label form-label-contrast small">Username:</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person-lines-fill text-secondary-contrast"></i></span>
-                                    <input type="text" id="newLogin" class="form-control" placeholder="Enter new login" required />
-                                </div>
-                            </div>
-
-                            <!--Password entry section-->
-                            <div class="mb-4">
-                                <label for="newPassword" class="form-label form-label-contrast small">Password:</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock text-secondary-contrast"></i></span>
-                                    <input type="password" id="newPassword" class="form-control" placeholder="Enter new password" required />
-                                </div>
-                            </div>
-
-
-
-
-                            <!--Sign Up Button-->
-                            <button type="submit" id="signUpButton" class="buttons btn btn-success w-100 py-3 fw-semibold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
-                                <span>Sign Up</span>
-                                <i class="bi bi-arrow-right"></i>
-                            </button>
-                        </form>
-
-                        <!--Result Message-->
-                        <div class="mt-3 text-center">
-                            <span id="signUpResult" class="small fw-semibold"></span>
-                        </div>
-
-                        <!-- Log In Link -->
-                        <div class="mt-3 text-center small">
-                            <span class="text-secondary-contrast">Already have an account?</span>
-                            <a href="SignIn.html" class="fw-semibold text-decoration-none">Log in</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
