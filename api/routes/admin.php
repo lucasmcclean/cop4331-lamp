@@ -31,16 +31,17 @@ if ($method === 'GET') {
 
         $sql = "SELECT ID AS id, `First Name` AS firstName, `Last Name` AS lastName,
                     Login AS login, Admin AS admin, Enabled AS enabled
-                FROM Users WHERE `First Name` LIKE :firstName
+                FROM Users WHERE ID != :self AND (`First Name` LIKE :firstName
                 OR `Last Name` LIKE :lastName OR Login LIKE :login";
 
-        $params = [':firstName' => $like, ':lastName' => $like, ':login' => $like];
+        $params = [':self' => $userId,':firstName' => $like, ':lastName' => $like, ':login' => $like];
 
         //if $search is an (int), add ID to sql and params to search for the user by ID as well
         if (is_numeric($search)) {
             $sql .= " OR ID = :id";
             $params[':id'] = (int) $search;
-        }
+	}
+	$sql .=")";
 
         try {
             $stmt = $db->prepare($sql);
