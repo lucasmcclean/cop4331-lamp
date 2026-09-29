@@ -8,6 +8,9 @@
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/helpers.php';
 
+// Must run before output so the session cookie header is emitted.
+startSession();
+
 setCORSHeaders();
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -20,7 +23,7 @@ if ($method === 'GET' && (isset($_GET['ping']) || $action === 'ping')) {
 }
 
 //2. Public authentication routes
-if ($action === 'login' || $action === 'register') {
+if ($action === 'login' || $action === 'logout' || $action === 'register') {
     require __DIR__ . '/routes/auth.php';
     exit;
 }

@@ -3,8 +3,15 @@
 //  routes/auth.php — Authentication Operations
 //
 //  POST ?action=login         — login user
+//  POST ?action=logout        — end the current session
 //  POST ?action=register      — register new user
 // ============================================================
+
+// Logout
+if ($action === 'logout') {
+    destroySession();
+    respond(200, ['message' => 'Signed out']);
+}
 
 // Login
 if ($method === 'POST' && $action === 'login') {
@@ -35,13 +42,17 @@ if ($method === 'POST' && $action === 'login') {
         if (!$user['Enabled']) {
             respond(403, ['error' => 'User account is disabled']);
         }
+
+        // New session ID on login defeats session fixation.
+        session_regenerate_id(true);
+        $_SESSION['userId'] = (int) $user['ID'];
+
         respond(200, [
             'id'        => (int) $user['ID'],
             'firstName' => $user['firstName'],
             'lastName'  => $user['lastName'],
             'admin'      => (int) $user['Admin'],
             'enabled'   => (int) $user['Enabled'],
-            'token'     => (string) $user['ID']
         ]);
     } else {
         respond(401, ['error' => 'Invalid login or password']);

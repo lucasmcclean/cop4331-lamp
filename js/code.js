@@ -9,12 +9,10 @@ const urlBase =
 
 const loginUrlBase = urlBase;
 
-let userId = 0;
 let firstName = "";
 let lastName = "";
 
 function doLogin() {
-  userId = 0;
   firstName = "";
   lastName = "";
 
@@ -36,14 +34,6 @@ function doLogin() {
       if (this.readyState === 4) {
         if (this.status === 200) {
           let jsonObject = JSON.parse(xhr.responseText);
-          userId = jsonObject.id;
-
-          if (userId < 1) {
-            document.getElementById("loginResult").innerHTML =
-              "<i class='bi bi-exclamation-circle-fill me-1'></i> User/Password combination incorrect";
-            return;
-          }
-
           firstName = jsonObject.firstName;
           lastName = jsonObject.lastName;
 
@@ -61,6 +51,7 @@ function doLogin() {
   }
 }
 
+// Display name only. The session cookie is HttpOnly and is the sole credential.
 function saveCookie() {
   let minutes = 20;
   let date = new Date();
@@ -70,15 +61,12 @@ function saveCookie() {
     encodeURIComponent(firstName) +
     ",lastName=" +
     encodeURIComponent(lastName) +
-    ",userId=" +
-    userId +
     ";expires=" +
     date.toGMTString() +
     ";path=/";
 }
 
 function readCookie() {
-  userId = -1;
   let data = document.cookie;
   let splits = data.split(";");
   for (var i = 0; i < splits.length; i++) {
@@ -90,14 +78,12 @@ function readCookie() {
         firstName = decodeURIComponent(keyVal[1] || "");
       } else if (keyVal[0] === "lastName") {
         lastName = decodeURIComponent(keyVal[1] || "");
-      } else if (keyVal[0] === "userId") {
-        userId = parseInt(keyVal[1].trim());
       }
     }
   }
 
-  if (userId < 0 || isNaN(userId)) {
-    window.location.href = "FrontPage.html";
+  if (!firstName) {
+    window.location.href = "SignIn.html";
   } else {
     let userNameEl = document.getElementById("userName");
     if (userNameEl) {
@@ -108,13 +94,17 @@ function readCookie() {
 }
 
 function doLogout() {
-  userId = 0;
-  firstName = "";
-  lastName = "";
-  document.cookie = "firstName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-  document.cookie = "lastName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-  document.cookie = "userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-  window.location.href = "index.html";
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", urlBase + "?action=logout", true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+  xhr.onload = function () {
+    firstName = "";
+    lastName = "";
+    document.cookie = "firstName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    document.cookie = "lastName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    window.location.href = "index.html";
+  };
+  xhr.send();
 }
 
 function addAccount() {
@@ -151,8 +141,6 @@ function addAccount() {
   let xhr = new XMLHttpRequest();
   xhr.open("POST", url, true);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-  xhr.setRequestHeader("Authorization", "Bearer " + userId);
-  xhr.setRequestHeader("X-User-Id", userId);
 
   try {
     xhr.onreadystatechange = function () {
@@ -220,8 +208,6 @@ function addContact() {
   let xhr = new XMLHttpRequest();
   xhr.open("POST", url, true);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-  xhr.setRequestHeader("Authorization", "Bearer " + userId);
-  xhr.setRequestHeader("X-User-Id", userId);
 
   try {
     xhr.onreadystatechange = function () {
@@ -297,8 +283,6 @@ function updateContact() {
   let xhr = new XMLHttpRequest();
   xhr.open("PUT", url, true);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-  xhr.setRequestHeader("Authorization", "Bearer " + userId);
-  xhr.setRequestHeader("X-User-Id", userId);
 
   try {
     xhr.onreadystatechange = function () {
@@ -353,8 +337,6 @@ function deleteContact() {
   let xhr = new XMLHttpRequest();
   xhr.open("DELETE", url, true);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-  xhr.setRequestHeader("Authorization", "Bearer " + userId);
-  xhr.setRequestHeader("X-User-Id", userId);
 
   try {
     xhr.onreadystatechange = function () {
@@ -405,8 +387,6 @@ function searchContacts() {
   let xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
-  xhr.setRequestHeader("Authorization", "Bearer " + userId);
-  xhr.setRequestHeader("X-User-Id", userId);
 
   try {
     xhr.onreadystatechange = function () {

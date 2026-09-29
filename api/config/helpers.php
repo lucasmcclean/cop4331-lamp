@@ -62,13 +62,40 @@ function loadEnv($path = null) {
 loadEnv();
 
 /**
- * Sets standard CORS headers to allow cross-origin API requests.
+ * Starts the session used to identify the caller.
+ * The cookie is HttpOnly so JavaScript cannot read it, and Secure over TLS.
+ */
+function startSession() {
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        return;
+    }
+
+    session_name('contacts_session');
+    session_set_cookie_params([
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+
+    session_start();
+}
+
+/**
+ * Sets CORS headers, echoing back only known front-end origins.
  * Handles preflight OPTIONS requests by exiting with 200 OK.
  */
 function setCORSHeaders() {
-    header("Access-Control-Allow-Origin: *");
+    $allowedOrigins = ['https://disc.quest', 'http://localhost', 'http://127.0.0.1'];
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+    if (in_array($origin, $allowedOrigins, true)) {
+        header("Access-Control-Allow-Origin: $origin");
+        header('Access-Control-Allow-Credentials: true');
+    }
+
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-User-Id");
+    header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
 
     if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(200);
@@ -119,40 +146,34 @@ function clean($data) {
 }
 
 /**
- * Requires authentication and returns the authenticated User ID.
- * Looks for user identification in headers, cookies, session, query parameters, or request body.
- * If unauthenticated, sends a 401 Unauthorized response and exits.
- *
- * @return int User ID
+ * Requires a valid session and returns the User ID.
+ * The ID is read only from the server-side session, then re-checked against
+ * the database so a disabled or deleted account loses access right away.
  */
 function requireAuth() {
-    $userId = null;
+    $userId = (int) ($_SESSION['userId'] ?? 0);
 
-    // 1. Check Authorization header (raw numeric token)
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION']
-        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
-        ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? null) : null);
-
-    if ($authHeader) {
-        $token = trim(preg_replace('/^Bearer\s+/i', '', $authHeader));
-        if (is_numeric($token) && (int) $token > 0) {
-            $userId = (int) $token;
-        }
-    }
-
-    // 2. Check X-User-Id or User-Id custom header
     if (!$userId) {
-        $xUserId = $_SERVER['HTTP_X_USER_ID'] ?? $_SERVER['HTTP_USER_ID'] ?? null;
-        if ($xUserId && is_numeric($xUserId) && (int) $xUserId > 0) {
-            $userId = (int) $xUserId;
-        }
-    }
-
-    if (!$userId || (int) $userId <= 0) {
         respond(401, ['error' => 'Unauthorized']);
     }
 
-    return (int) $userId;
+    $stmt = getDB()->prepare('SELECT ID FROM Users WHERE ID = :id AND Enabled = 1 LIMIT 1');
+    $stmt->execute([':id' => $userId]);
+
+    if (!$stmt->fetch()) {
+        destroySession();
+        respond(401, ['error' => 'Session is no longer valid']);
+    }
+
+    return $userId;
+}
+
+/**
+ * Clears the session data.
+ */
+function destroySession() {
+    $_SESSION = [];
+    session_destroy();
 }
 
 // 7. check name format
