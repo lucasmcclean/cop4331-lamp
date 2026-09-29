@@ -88,11 +88,18 @@
                                     View a User's Entries
                                 </label>
                                 <div class="row g-3">
-                                    <div class="col-12 col-md-8">
+                                    <div class="col-12 col-md-4">
                                         <label for="viewUserId" class="form-label">User ID</label>
                                         <input type="text" id="viewUserId" class="form-control" placeholder="Enter user ID" />
                                     </div>
-                                    <div class="col-12 col-md-4 d-flex align-items-end">
+                                    <div class="col-12 col-md-8">
+                                        <label for="viewContactsSearch" class="form-label">
+                                            Search
+                                        </label>
+                                        <input type="text" id="viewContactsSearch" class="form-control"
+                                               placeholder="Search name, email, phone, or contact ID" />
+                                    </div>
+                                    <div class="col-12 d-flex align-items-end">
                                         <button type="button" class="buttons btn btn-primary fw-semibold w-100"
                                                 onclick="viewUserContacts();">
                                             <i class="bi bi-journal-text me-2"></i> View Entries

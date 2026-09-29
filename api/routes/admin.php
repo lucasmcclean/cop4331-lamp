@@ -3,7 +3,7 @@
 //  routes/admin.php — Admin Operations
 //
 //  GET  ?action=admin&operation=userSearch&q=term  — search users
-//  GET  ?action=admin&operation=contactList&id=1   — view user's contacts
+//  GET  ?action=admin&operation=contactList&id=1&q=term — search a user's contacts
 //  PUT  ?action=admin&operation=toggle&id=1        — enable/disable user
 //  PUT  ?action=admin&operation=passwordUpdate&id=1 — change user password
 //  POST ?action=admin                              — create User/Admin
@@ -31,17 +31,17 @@ if ($method === 'GET') {
 
         $sql = "SELECT ID AS id, `First Name` AS firstName, `Last Name` AS lastName,
                     Login AS login, Admin AS admin, Enabled AS enabled
-                FROM Users WHERE ID != :self AND (`First Name` LIKE :firstName
+                FROM Users WHERE (`First Name` LIKE :firstName
                 OR `Last Name` LIKE :lastName OR Login LIKE :login";
 
-        $params = [':self' => $userId,':firstName' => $like, ':lastName' => $like, ':login' => $like];
+        $params = [':firstName' => $like, ':lastName' => $like, ':login' => $like];
 
         //if $search is an (int), add ID to sql and params to search for the user by ID as well
         if (is_numeric($search)) {
             $sql .= " OR ID = :id";
             $params[':id'] = (int) $search;
-	}
-	$sql .=")";
+	    }
+	$sql .=") ORDER BY ID LIMIT 100";
 
         try {
             $stmt = $db->prepare($sql);
@@ -70,14 +70,25 @@ if ($method === 'GET') {
             respond(404, ['error' => 'User not found']);
         }
 
+        $search = $_GET['q'] ?? '';
+        $search = str_replace(['%', '_'], ['\\%', '\\_'], $search);
+        $like = '%' . $search . '%';
+
         try {
             $stmt = $db->prepare(
                 "SELECT ID AS id, `First Name` AS firstName, `Last Name` AS lastName,
                         `E-mail Address` AS email, `Phone Number` AS phoneNumber
-                 FROM Contacts WHERE UserID = :uid"
+                 FROM Contacts WHERE UserID = :uid AND (
+                     `First Name` LIKE :firstName OR `Last Name` LIKE :lastName
+                     OR `E-mail Address` LIKE :email OR `Phone Number` LIKE :phoneNumber
+                     OR ID LIKE :id)
+                 ORDER BY ID LIMIT 100"
             );
 
-            $stmt->execute([':uid' => $id]);
+            $stmt->execute([
+                ':uid' => $id, ':firstName' => $like, ':lastName' => $like,
+                ':email' => $like, ':phoneNumber' => $like, ':id' => $like
+            ]);
 
             $contacts = $stmt->fetchAll();
             respond(200, ['contacts' => $contacts]);

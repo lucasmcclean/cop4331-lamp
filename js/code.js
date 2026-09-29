@@ -538,6 +538,8 @@ function searchUsers() {
 
 function viewUserContacts() {
   let id = adminId("viewUserId");
+  let searchEl = document.getElementById("viewContactsSearch");
+  let search = searchEl ? searchEl.value.trim() : "";
   let resultEl = document.getElementById("userContactsResult");
   if (!id) {
     resultEl.className = "text-warning small fw-semibold";
@@ -545,7 +547,12 @@ function viewUserContacts() {
     return;
   }
 
-  let url = urlBase + "?action=admin&operation=contactList&id=" + encodeURIComponent(id);
+  let url =
+    urlBase +
+    "?action=admin&operation=contactList&id=" +
+    encodeURIComponent(id) +
+    "&q=" +
+    encodeURIComponent(search);
 
   adminRequest("GET", url, undefined, resultEl, function (res) {
     let contacts = Array.isArray(res.contacts) ? res.contacts : [];

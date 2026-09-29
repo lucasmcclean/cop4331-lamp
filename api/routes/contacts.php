@@ -21,7 +21,8 @@ if ($method === 'GET') {
              FROM Contacts WHERE UserID = :uid AND (
                  `First Name` LIKE :firstName OR `Last Name` LIKE :lastName
                  OR `E-mail Address` LIKE :email OR `Phone Number` LIKE :phoneNumber
-                 OR ID LIKE :id)"
+                 OR ID LIKE :id)
+             ORDER BY ID LIMIT 100"
         );
 
         $stmt->execute([

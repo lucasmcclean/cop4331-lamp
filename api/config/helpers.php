@@ -64,6 +64,7 @@ loadEnv();
 /**
  * Starts the session used to identify the caller.
  * The cookie is HttpOnly so JavaScript cannot read it, and Secure over TLS.
+ * Enforces a 20-minute idle timeout, enforced server-side.
  */
 function startSession() {
     if (session_status() === PHP_SESSION_ACTIVE) {
@@ -79,6 +80,14 @@ function startSession() {
     ]);
 
     session_start();
+
+    $idleLimit = 20 * 60;
+    $now = time();
+
+    if (isset($_SESSION['lastActivity']) && ($now - $_SESSION['lastActivity']) > $idleLimit) {
+        $_SESSION = [];
+    }
+    $_SESSION['lastActivity'] = $now;
 }
 
 /**
