@@ -1,23 +1,44 @@
+
+body {
+  background-color: #f8f3e7;
+  color: #263326;
+}
+
 .background-glow {
   position: fixed;
   inset: 0;
   pointer-events: none;
+  z-index: 0;
   background:
-    radial-gradient(circle at 20% 20%, rgba(13, 110, 253, 0.15), transparent 45%),
-    radial-gradient(circle at 80% 70%, rgba(111, 66, 193, 0.15), transparent 45%);
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(76, 175, 80, 0.18),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(46, 125, 50, 0.14),
+      transparent 45%
+    );
 }
 
 .glass-card {
-  background: rgba(33, 37, 41, 0.65);
+  background: rgba(255, 253, 245, 0.78);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(46, 125, 50, 0.12);
 }
+
+/* ================================
+   App Icons
+   ================================ */
 
 .app-icon-wrapper,
 .app-icon-wrapper-sm {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0d6efd, #6f42c1);
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: #fff;
   border-radius: 1rem;
 }
@@ -35,19 +56,110 @@
 }
 
 .section-card {
-  background: rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(46, 125, 50, 0.15) !important;
 }
+
 
 .text-secondary-contrast,
 .form-label-contrast {
-  color: rgba(255, 255, 255, 0.75);
+   color: #263326 !important;
+
 }
 
 .text-success-wcag {
-  color: #198754;
+  color: #2e7d32 !important;
 }
 
 .text-danger-wcag {
-  color: #dc3545;
+  color: #c62828 !important;
+}
+
+
+.form-control,
+.input-group-text {
+  background-color: #fffdf5 !important;
+  color: #263326 !important;
+  border-color: rgba(46, 125, 50, 0.25) !important;
+}
+
+.form-control::placeholder {
+  color: rgba(40, 55, 40, 0.5) !important;
+}
+
+.form-control:focus {
+  background-color: #ffffff !important;
+  color: #263326 !important;
+  border-color: #4caf50 !important;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15) !important;
+}
+
+.input-group-text {
+  background-color: #f5f0e2 !important;
+}
+
+.input-group-text i {
+  color: #2e7d32 !important;
+}
+
+.input-group .form-control {
+  border-radius: 0 0.75rem 0.75rem 0 !important;
+}
+
+.input-group .input-group-text {
+  border-radius: 0.75rem 0 0 0.75rem !important;
+}
+
+.form-control:active,
+.form-control:hover {
+  background-color: #fffdf5 !important;
+  color: #263326 !important;
+}
+
+
+
+
+/* ================================
+   Dropdown / Select Fields
+   ================================ */
+
+.form-select {
+  background-color: #fffdf5 !important;
+  color: #263326 !important;
+  border-color: rgba(46, 125, 50, 0.25) !important;
+  border-radius: 0.375rem;
+  min-height: 38px;
+  cursor: pointer;
+
+  /* Custom green dropdown arrow */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%232e7d32' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+
+/* Dropdown when focused */
+.form-select:focus {
+  background-color: #ffffff !important;
+  color: #263326 !important;
+  border-color: #4caf50 !important;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15) !important;
+}
+
+/* Hover */
+.form-select:hover {
+  background-color: #fffdf5 !important;
+  color: #263326 !important;
+  border-color: rgba(46, 125, 50, 0.4) !important;
+}
+
+/* Dropdown options */
+.form-select option {
+  background-color: #fffdf5;
+  color: #263326;
+}
+
+/* Disabled placeholder option */
+.form-select option:disabled {
+  color: rgba(40, 55, 40, 0.5);
 }

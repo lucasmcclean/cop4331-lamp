@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COP 4331 LAMP Stack Demo</title>
+    <title>Sign In — Personal Contacts Manager</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,16 +25,15 @@
                 <!-- Title Header -->
                 <div class="text-center mb-4">
                     <div class="app-icon-wrapper mb-3 mx-auto">
-                        <i class="bi bi-palette-fill"></i>
+                        <i class="bi bi-person-circle"></i>
                     </div>
-                    <h1 id="title" class="fw-bold tracking-tight">COP 4331 LAMP Stack Personal Contacts Manager</h1>
-                    <p class="text-secondary-contrast small">Contacts Manager Portal</p>
+                    <h1 id="title" class="fw-bold tracking-tight">Personal Contacts Manager</h1>
                 </div>
 
                 <!-- Login Card -->
                 <div id="loginDiv" class="card glass-card shadow-lg border-0 p-4 p-sm-5">
                     <div class="card-body p-0">
-                        <span id="inner-title" class="d-block text-center fw-semibold text-uppercase tracking-wider mb-4 fs-5">Please Log In</span>
+                        <span id="inner-title" class="d-block text-center fw-semibold text-uppercase tracking-wider mb-4 fs-5" style="color: #14532d;">Please Log In</span>
 
                         <form id="loginForm" onsubmit="event.preventDefault(); doLogin();" class="needs-validation">
                             <!-- Username Input Group -->
@@ -56,7 +55,7 @@
                             </div>
 
                             <!-- Login Button -->
-                            <button type="submit" id="loginButton" class="buttons btn btn-primary w-100 py-3 fw-semibold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <button type="submit" id="loginButton" class="buttons btn btn-success w-100 py-3 fw-semibold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
                                 <span>Sign In</span>
                                 <i class="bi bi-arrow-right"></i>
                             </button>
@@ -70,7 +69,7 @@
                         <!-- Create Account Link -->
                         <div class="mt-3 text-center small">
                             <span class="text-secondary-contrast">Don't have an account?</span>
-                            <a href="SignUp.html" class="fw-semibold text-decoration-none">Create one</a>
+                            <a href="SignUp.html" class="fw-semibold text-decoration-none" style="color: #2e7d32;">Create one</a>
                         </div>
                     </div>
                 </div>

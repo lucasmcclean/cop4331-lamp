@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COP 4331 LAMP Stack Demo</title>
+    <title>Personal Contacts Manager</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,8 @@
     <link href="css/styles.css" rel="stylesheet">
     <!-- Scripts -->
     <script type="text/javascript" src="js/code.js"></script>
-    <script type="text/javascript">document.addEventListener('DOMContentLoaded', function() {
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
             readCookie();
         }, false);</script>
 </head>
@@ -29,15 +30,15 @@
                 <div class="d-flex flex-column flex-md-row align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary-subtle gap-3">
                     <div class="d-flex align-items-center gap-3">
                         <div class="app-icon-wrapper-sm">
-                            <i class="bi bi-palette-fill"></i>
+                            <i class="bi bi-person-lines-fill"></i>
                         </div>
                         <h1 id="title" class="h3 fw-bold mb-0">Personal Contacts Manager</h1>
                     </div>
 
                     <!-- Logged In User Info & Logout Button -->
-                    <div id="loggedInDiv" class="d-flex align-items-center gap-3 bg-body-tertiary px-3 py-2 rounded-pill border">
+                    <div id="loggedInDiv" class="d-flex align-items-center gap-3 px-3 py-2 rounded-pill" style="background-color: #f8f1e3; border: 1px solid #d8cdb8;">
                         <span id="userName" class="small fw-medium text-body"></span>
-                        <a id="adminLink" href="AdminPage.html" class="btn btn-sm btn-outline-primary rounded-pill px-3 d-none">
+                        <a id="adminLink" href="AdminPage.html" class="btn btn-sm btn-outline-success rounded-pill px-3 d-none">
                             <i class="bi bi-shield-lock me-1"></i> Admin
                         </a>
                         <button type="button" id="logoutButton" class="buttons btn btn-outline-danger btn-sm rounded-pill px-3" onclick="doLogout();">
@@ -49,14 +50,13 @@
                 <!-- Access UI Card -->
                 <div id="accessUIDiv" class="card glass-card shadow-lg border-0 p-4 p-md-5">
                     <div class="card-body p-0">
-                        <h2 class="h5 fw-bold mb-4 d-flex align-items-center gap-2 text-white">
-                            <i class="bi bi-sliders text-primary"></i> Contact Manager
+                        <h2 class="h5 fw-bold mb-4 d-flex align-items-center gap-2" style="color: #14532d;">
+                            <i class="bi bi-person-vcard" style="color: #14532d;"></i> Contact Manager
                         </h2>
 
 
-
                         <!-- Create Contact Section -->
-                        <div class="section-card p-4 rounded-4 border">
+                        <div class="section-card p-4 rounded-4 border mb-4">
                             <label class="form-label form-label-contrast small text-uppercase mb-3">
                                 Create New Contact
                             </label>
@@ -65,30 +65,41 @@
 
                                 <!-- First Name -->
                                 <div class="col-md-6">
-                                    <label for="firstName" class="form-label">First Name</label>
-                                    <input type="text" id="firstName" class="form-control" placeholder="Enter first name" required />
+                                    <label for="firstName" class="form-label form-label-contrast small">First Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
+                                        <input type="text" id="firstName" class="form-control" placeholder="Enter first name" required />
+                                    </div>
                                 </div>
 
                                 <!-- Last Name -->
                                 <div class="col-md-6">
-                                    <label for="lastName" class="form-label">Last Name</label>
-                                    <input type="text" id="lastName" class="form-control" placeholder="Enter last name" required />
+                                    <label for="lastName" class="form-label form-label-contrast small">Last Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
+                                        <input type="text" id="lastName" class="form-control" placeholder="Enter last name" required />
+                                    </div>
                                 </div>
 
 
-                                <!-- Phone Number (try input type tel? currently set to type text, see which works with DB)-->
+                                <!-- Phone Number -->
                                 <div class="col-md-6">
-                                    <label for="phoneNum" class="form-label">Phone Number</label>
-                                    <input type="text" id="phoneNum" class="form-control" placeholder="Enter phone number" required />
+                                    <label for="phoneNum" class="form-label form-label-contrast small">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone text-secondary-contrast"></i></span>
+                                        <input type="text" id="phoneNum" class="form-control" placeholder="Enter phone number" required />
+                                    </div>
                                 </div>
 
 
-                                <!-- Email Address (try input type email instead of text?)-->
+                                <!-- Email Address -->
                                 <div class="col-md-6">
-                                    <label for="emailAdd" class="form-label">Email Address</label>
-                                    <input type="text" id="emailAdd" class="form-control" placeholder="Enter email" required />
+                                    <label for="emailAdd" class="form-label form-label-contrast small">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope-at text-secondary-contrast"></i></span>
+                                        <input type="text" id="emailAdd" class="form-control" placeholder="Enter email" required />
+                                    </div>
                                 </div>
-
 
 
 
@@ -96,7 +107,7 @@
                                 <!-- Add Contact Button -->
                                 <div class="col-12">
                                     <button type="button" id="createContactButton" class="buttons btn btn-success px-4 fw-semibold w-100" onclick="addContact();">
-                                        <i class="bi bi-person-plus me-2"></i>
+                                        <i class="bi bi-person-add me-2"></i>
                                         Add Contact
                                     </button>
                                 </div>
@@ -110,7 +121,7 @@
 
 
                         <!-- Search Contacts Section -->
-                        <div class="section-card p-4 rounded-4 border">
+                        <div class="section-card p-4 rounded-4 border mb-4">
                             <label class="form-label form-label-contrast small text-uppercase mb-3">
                                 Search Contacts
                             </label>
@@ -119,25 +130,24 @@
 
                                 <!-- Search Value -->
                                 <div class="col-12">
-                                    <label for="searchValue" class="form-label">
+                                    <label for="searchValue" class="form-label form-label-contrast small">
                                         Search
                                     </label>
 
-                                    <input type="text"
-                                           id="searchValue"
-                                           class="form-control"
-                                           placeholder="Search name, email, phone, or contact ID" />
-                                </div>
-
-                                <!-- Search Button -->
-                                <div class="col-12">
-                                    <button type="button"
-                                            id="searchContactButton"
-                                            class="buttons btn btn-primary px-4 fw-semibold w-100"
-                                            onclick="searchContacts();">
-                                        <i class="bi bi-search me-2"></i>
-                                        Search Contacts
-                                    </button>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-search text-secondary-contrast"></i></span>
+                                        <input type="text"
+                                               id="searchValue"
+                                               class="form-control"
+                                               placeholder="Search name, email, phone, or contact ID"
+                                               onkeyup="if(event.key === 'Enter') searchContacts();" />
+                                        <button type="button"
+                                                id="searchContactButton"
+                                                class="buttons btn btn-success px-4 fw-semibold"
+                                                onclick="searchContacts();">
+                                            Search
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -152,45 +162,59 @@
 
 
                         <!-- Update Contact Section -->
-                        <div class="section-card p-4 rounded-4 border">
+                        <div class="section-card p-4 rounded-4 border mb-4">
                             <label class="form-label form-label-contrast small text-uppercase mb-3">
                                 Update Contact
                             </label>
 
                             <div class="row g-3">
 
-                                <!-- Contact ID-->
+                                <!-- Contact ID -->
                                 <div class="col-md-6">
-                                    <label for="contactID" class="form-label">Contact ID</label>
-                                    <input type="text" id="contactID" class="form-control" placeholder="Enter contact ID" required />
+                                    <label for="contactID" class="form-label form-label-contrast small">Contact ID</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-hash text-secondary-contrast"></i></span>
+                                        <input type="text" id="contactID" class="form-control" placeholder="Enter contact ID" required />
+                                    </div>
                                 </div>
 
                                 <!-- First Name -->
                                 <div class="col-md-6">
-                                    <label for="firstNameUpdate" class="form-label">First Name</label>
-                                    <input type="text" id="firstNameUpdate" class="form-control" placeholder="Enter first name" required />
+                                    <label for="firstNameUpdate" class="form-label form-label-contrast small">First Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
+                                        <input type="text" id="firstNameUpdate" class="form-control" placeholder="Enter first name" required />
+                                    </div>
                                 </div>
 
                                 <!-- Last Name -->
                                 <div class="col-md-6">
-                                    <label for="lastNameUpdate" class="form-label">Last Name</label>
-                                    <input type="text" id="lastNameUpdate" class="form-control" placeholder="Enter last name" required />
+                                    <label for="lastNameUpdate" class="form-label form-label-contrast small">Last Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
+                                        <input type="text" id="lastNameUpdate" class="form-control" placeholder="Enter last name" required />
+                                    </div>
                                 </div>
 
 
-                                <!-- Phone Number-->
+                                <!-- Phone Number -->
                                 <div class="col-md-6">
-                                    <label for="phoneNumUpdate" class="form-label">Phone Number</label>
-                                    <input type="text" id="phoneNumUpdate" class="form-control" placeholder="Enter phone number" required />
+                                    <label for="phoneNumUpdate" class="form-label form-label-contrast small">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone text-secondary-contrast"></i></span>
+                                        <input type="text" id="phoneNumUpdate" class="form-control" placeholder="Enter phone number" required />
+                                    </div>
                                 </div>
 
 
                                 <!-- Email Address -->
                                 <div class="col-md-6">
-                                    <label for="emailAddUpdate" class="form-label">Email Address</label>
-                                    <input type="text" id="emailAddUpdate" class="form-control" placeholder="Enter email" required />
+                                    <label for="emailAddUpdate" class="form-label form-label-contrast small">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope-at text-secondary-contrast"></i></span>
+                                        <input type="text" id="emailAddUpdate" class="form-control" placeholder="Enter email" required />
+                                    </div>
                                 </div>
-
 
 
 
@@ -198,7 +222,7 @@
                                 <!-- Update Contact Button -->
                                 <div class="col-12">
                                     <button type="button" id="updateContactButton" class="buttons btn btn-success px-4 fw-semibold w-100" onclick="updateContact();">
-                                        <i class="bi bi-person-plus me-2"></i>
+                                        <i class="bi bi-pencil-square me-2"></i>
                                         Update Contact
                                     </button>
                                 </div>
@@ -212,8 +236,7 @@
 
 
 
-
-                        <!--Delete Contact Section-->
+                        <!-- Delete Contact Section -->
                         <div class="section-card p-4 rounded-4 border">
                             <label class="form-label form-label-contrast small text-uppercase mb-3">
                                 Delete Contact
@@ -222,15 +245,17 @@
                             <div class="row g-3">
 
                                 <div class="col-md-6">
-                                    <label for="contactIdDelete" class="form-label">Contact ID</label>
-                                    <input type="text" id="contactIdDelete" class="form-control" placeholder="Enter contact ID" required />
+                                    <label for="contactIdDelete" class="form-label form-label-contrast small">Contact ID</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-hash text-secondary-contrast"></i></span>
+                                        <input type="text" id="contactIdDelete" class="form-control" placeholder="Enter contact ID" required />
+                                    </div>
                                 </div>
-                           
 
 
                                 <div class="col-12">
-                                    <button type="button" id="deleteContactButton" class="buttons btn btn-success px-4 fw-semibold w-100" onclick="deleteContact();">
-                                        <i class="bi bi-person-plus me-2"></i>
+                                    <button type="button" id="deleteContactButton" class="buttons btn btn-danger px-4 fw-semibold w-100" onclick="deleteContact();">
+                                        <i class="bi bi-trash me-2"></i>
                                         Delete Contact
                                     </button>
                                 </div>

@@ -95,7 +95,7 @@ function readCookie() {
   } else {
     let userNameEl = document.getElementById("userName");
     if (userNameEl) {
-      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="text-white"></strong></span>`;
+      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1 text-success"></i> <span>Logged in as <strong></strong></span>`;
       userNameEl.querySelector("strong").textContent = firstName + " " + lastName;
     }
 
@@ -529,7 +529,7 @@ function searchUsers() {
       .join("");
 
     resultEl.innerHTML = `<div class="table-responsive">
-      <table class="table table-sm table-dark table-striped align-middle mb-0">
+      <table class="table table-sm table-light table-striped align-middle mb-0">
         <thead><tr><th>ID</th><th>Name</th><th>Login</th><th>Role</th><th>Status</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>`;
@@ -575,7 +575,7 @@ function viewUserContacts() {
       .join("");
 
     resultEl.innerHTML = `<div class="table-responsive">
-      <table class="table table-sm table-dark table-striped align-middle mb-0">
+      <table class="table table-sm table-light table-striped align-middle mb-0">
         <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>`;
