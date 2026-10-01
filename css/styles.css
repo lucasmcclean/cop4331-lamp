@@ -87,13 +87,6 @@ body {
   color: rgba(40, 55, 40, 0.5) !important;
 }
 
-.form-control:focus {
-  background-color: #ffffff !important;
-  color: #263326 !important;
-  border-color: #4caf50 !important;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15) !important;
-}
-
 .input-group-text {
   background-color: #f5f0e2 !important;
 }
@@ -114,6 +107,13 @@ body {
 .form-control:hover {
   background-color: #fffdf5 !important;
   color: #263326 !important;
+}
+
+.form-control:focus {
+  background-color: #ffffff !important;
+  color: #263326 !important;
+  border-color: #4caf50 !important;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15) !important;
 }
 
 

@@ -13,6 +13,9 @@ if ($method === 'GET') {
     $search = $_GET['q'] ?? '';
     $search = str_replace(['%', '_'], ['\\%', '\\_'], $search);
     $like = '%' . $search . '%';
+    // A contact ID is a single number, so it is matched exactly. Using LIKE
+    // here turned "2" into a substring search that matched IDs 213 and 214.
+    $id = ctype_digit($search) ? (int) $search : -1;
 
     try {
         $stmt = $db->prepare(
@@ -21,13 +24,13 @@ if ($method === 'GET') {
              FROM Contacts WHERE UserID = :uid AND (
                  `First Name` LIKE :firstName OR `Last Name` LIKE :lastName
                  OR `E-mail Address` LIKE :email OR `Phone Number` LIKE :phoneNumber
-                 OR ID LIKE :id)
+                 OR ID = :id)
              ORDER BY ID LIMIT 100"
         );
 
         $stmt->execute([
             ':uid' => $userId, ':firstName' => $like, ':lastName' => $like,
-            ':email' => $like, ':phoneNumber' => $like, ':id' => $like
+            ':email' => $like, ':phoneNumber' => $like, ':id' => $id
         ]);
 
         $contacts = $stmt->fetchAll();

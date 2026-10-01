@@ -67,7 +67,7 @@
                 </div>
 
                 <!-- Shown until the server confirms admin rights -->
-                <div id="adminAccessResult" class="mb-3"></div>
+                <div id="adminAccessResult" class="mb-3" role="status"></div>
 
                 <!-- Shown only when js/code.js does not match this page -->
                 <div id="assetVersionWarning" class="d-none"></div>
@@ -93,7 +93,7 @@
                             </div>
                             <div class="mt-3">
                                 <div id="userList" class="mt-2 d-flex flex-wrap gap-2"></div>
-                                <span id="userToggleResult" class="small fw-semibold"></span>
+                                <span id="userToggleResult" class="small fw-semibold" role="status"></span>
                             </div>
                         </div>
 
@@ -105,13 +105,14 @@
                             <label for="adminContactsSearch" class="form-label form-label-contrast small text-uppercase">User Entries</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-search text-secondary-contrast"></i></span>
-                                <input type="text" id="adminContactsSearch" class="form-control" placeholder="Search this user's name, email, phone, or contact ID" />
+                                <input type="text" id="adminContactsSearch" class="form-control" placeholder="Search the selected user's name, email, phone, or contact ID" aria-label="Search the selected user's contacts" />
                                 <button type="button" class="buttons btn btn-success px-4 fw-semibold" onclick="adminSearchContacts(this);">
                                     Search
                                 </button>
                             </div>
                             <div class="mt-3">
-                                <div id="contactSearchResultAdmin" class="mt-2 d-flex flex-wrap gap-2"></div>
+                                <div id="contactsTargetName" class="small fw-semibold mb-2" role="status"></div>
+                                <div id="contactSearchResultAdmin" class="mt-2 d-flex flex-wrap gap-2" role="status"></div>
                             </div>
                         </div>
 
@@ -119,9 +120,9 @@
 
                         <!-- Update Password Section -->
                         <div class="section-card p-4 rounded-4 border mb-4">
-                            <label class="form-label form-label-contrast small text-uppercase mb-3">
+                            <h3 class="form-label form-label-contrast small text-uppercase fw-normal mb-3">
                                 Change a User's Password
-                            </label>
+                            </h3>
 
                             <p class="small mb-3">
                                 Click the <i class="bi bi-key"></i> key icon on the user you want to change,
@@ -155,7 +156,7 @@
                             </div>
 
                             <div class="mt-3 text-start">
-                                <span id="passwordUpdateResult" class="small fw-semibold"></span>
+                                <span id="passwordUpdateResult" class="small fw-semibold" role="status"></span>
                             </div>
                         </div>
 
@@ -163,9 +164,9 @@
 
                         <!-- Create User Section -->
                         <div class="section-card p-4 rounded-4 border">
-                            <label class="form-label form-label-contrast small text-uppercase mb-3">
+                            <h3 class="form-label form-label-contrast small text-uppercase fw-normal mb-3">
                                 Create New User
-                            </label>
+                            </h3>
 
                             <div class="row g-3">
 
@@ -246,7 +247,7 @@
                             </div>
 
                             <div class="mt-3 text-start">
-                                <span id="userAddResult" class="small fw-semibold"></span>
+                                <span id="userAddResult" class="small fw-semibold" role="status"></span>
                             </div>
                         </div>
 

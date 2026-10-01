@@ -46,8 +46,12 @@ function escapeHtml(s) {
 // Every API failure funnels through here. Without it the UI reported the
 // wrong thing: an expired session showed "Error searching contacts", and
 // the raw 401 body ("Unauthorized") was printed into the page.
-function showApiError(xhr, resultEl, fallback) {
-  if (xhr.status === 401) {
+//
+// redirectOn401 exists for the sign-in page itself: a wrong password is a
+// 401, so the redirect reloaded SignIn.html, cleared the form and threw
+// away the "Invalid login or password" message, leaving a silent failure.
+function showApiError(xhr, resultEl, fallback, redirectOn401 = true) {
+  if (xhr.status === 401 && redirectOn401) {
     window.location.href = "SignIn.html";
     return;
   }
@@ -128,8 +132,16 @@ function doLogin() {
       saveCookie();
       window.location.href = json.admin === 1 ? "AdminPage.html" : "ContactManager.html";
     } else {
-      // A 403 here is a disabled account, which is worth showing verbatim.
-      showApiError(this, resultEl, "Login failed");
+      // A 403 here is a disabled account and a 401 is a bad password; both
+      // carry a message worth showing instead of bouncing to SignIn.html,
+      // which would reload this page and erase it.
+      showApiError(this, resultEl, "Login failed", false);
+      // Keep the username so the retry only needs the password retyped.
+      let pw = document.getElementById("loginPassword");
+      if (pw) {
+        pw.value = "";
+        pw.focus();
+      }
     }
   };
 
@@ -608,8 +620,11 @@ function searchUsers() {
     resultEl.className = "mt-2 d-flex flex-wrap gap-2";
 
     // The selected password target lives on a row that may just have been
-    // re-rendered, so the reference is stale after any refresh.
+    // re-rendered, so the reference is stale after any refresh. The same is
+    // true of the entries panel: without this it kept showing the previous
+    // user's contacts with no indication of whose they were.
     clearPasswordTarget();
+    clearContactsTarget();
 
     if (users.length === 0) {
       resultEl.innerHTML =
@@ -619,7 +634,7 @@ function searchUsers() {
 
     resultEl.innerHTML = users
       .map(
-        (u) => `<span class="badge bg-body-tertiary text-body border border-success px-3 py-2 fs-6 d-inline-flex align-items-center gap-2"
+        (u) => `<span class="badge bg-body-tertiary text-body border px-3 py-2 fs-6 d-inline-flex align-items-center gap-2"
                       data-user data-id="${escapeHtml(String(u.id))}"
                       data-enabled="${escapeHtml(String(u.enabled))}"
                       data-first="${escapeHtml(u.firstName)}"
@@ -716,7 +731,6 @@ escapeHtml(u.first + " " + u.last) +
 
   document.querySelectorAll("[data-user]").forEach((row) => {
     row.classList.toggle("border-success", row === el.closest("[data-user]"));
-    row.classList.toggle("border", row !== el.closest("[data-user]"));
   });
 
   let resultEl = document.getElementById("passwordUpdateResult");
@@ -735,6 +749,21 @@ function clearPasswordTarget() {
   document
     .querySelectorAll("[data-user]")
     .forEach((row) => row.classList.remove("border-success"));
+}
+
+// Which user's entries the "User Entries" box is showing. The magnifier on a
+// user row sets it. Without it the section's own Search button had no row to
+// read from, so adminSearchContacts returned early and did nothing at all.
+let contactsTarget = null;
+
+function clearContactsTarget() {
+  contactsTarget = null;
+
+  let labelEl = document.getElementById("contactsTargetName");
+  if (labelEl) labelEl.innerHTML = "";
+
+  let panel = document.getElementById("contactSearchResultAdmin");
+  if (panel) panel.innerHTML = "";
 }
 
 function updatePassword() {
@@ -796,8 +825,35 @@ function updatePassword() {
 }
 
 function adminSearchContacts(el) {
-  let u = rowData(el, "[data-user]");
-  if (!u) return;
+  // A click on a user row's magnifier supplies the target; a click on the
+  // section's own Search button does not, so fall back to the last one viewed
+  // and tell the admin to pick a user rather than failing silently.
+  let u = el && el.closest ? rowData(el, "[data-user]") : null;
+  if (!u) {
+    u = contactsTarget;
+    if (!u) {
+      let panel = document.getElementById("contactSearchResultAdmin");
+      if (panel) {
+        panel.className = "mt-2 d-flex flex-wrap gap-2";
+        panel.innerHTML =
+          "<span class='small italic'>Choose a user with the " +
+          "<i class='bi bi-search me-1'></i>View Entries button first.</span>";
+      }
+      return;
+    }
+  }
+
+  contactsTarget = u;
+
+  let labelEl = document.getElementById("contactsTargetName");
+  if (labelEl) {
+    labelEl.innerHTML =
+      "<i class='bi bi-person-lines-fill me-1'></i> Entries for <strong>" +
+      escapeHtml(u.first + " " + u.last) +
+      "</strong> (login: " +
+      escapeHtml(u.login) +
+      ")";
+  }
 
   let search = field("adminContactsSearch");
   let resultEl = document.getElementById("contactSearchResultAdmin");
