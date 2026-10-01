@@ -312,6 +312,11 @@ function searchContacts() {
   let resultEl = document.getElementById("contactSearchResult");
   resultEl.innerHTML = "";
 
+  // A new search invalidates whatever was loaded below; clear the notice so a
+  // stale "Loaded ..." line cannot sit under unrelated results.
+  let loadedMsg = document.getElementById("contactEditLoaded");
+  if (loadedMsg) loadedMsg.innerHTML = "";
+
   let xhr = new XMLHttpRequest();
   xhr.open("GET", urlBase + "?q=" + encodeURIComponent(search), true);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
@@ -377,10 +382,33 @@ function editContact(el) {
   document.getElementById("editEmail").value = c.email;
   document.getElementById("saveContactButton").disabled = false;
 
+  // "Editing contact 205" lives at the bottom of the form, which sits well
+  // below the fold once a search returns more than a couple of contacts.
+  // Clicking Edit looked like nothing happened: the form filled in off-screen,
+  // the page never moved, and the results area showed no change. Bring the
+  // form into view and announce the load where the cursor already is.
+  let section = document.getElementById("editContactSection");
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   let resultEl = document.getElementById("contactUpdateResult");
   resultEl.className = "small fw-semibold";
   resultEl.innerHTML =
     "<i class='bi bi-pencil-square me-1'></i> Editing contact " + escapeHtml(c.id);
+
+  let listMsg = document.getElementById("contactEditLoaded");
+  if (listMsg) {
+    listMsg.innerHTML =
+      "<i class='bi bi-pencil-square me-1'></i> Loaded <strong>" +
+      escapeHtml(c.first + " " + c.last) +
+      "</strong> (ID: " +
+      escapeHtml(c.id) +
+      ") into the edit form below";
+  }
+
+  let nameInput = document.getElementById("editFirstName");
+  if (nameInput) nameInput.focus({ preventScroll: true });
 }
 
 // Searching replaced the results list but left the loaded contact in the edit
@@ -419,6 +447,9 @@ function resetEditForm() {
     "editEmail"
   );
   document.getElementById("saveContactButton").disabled = true;
+
+  let listMsg = document.getElementById("contactEditLoaded");
+  if (listMsg) listMsg.innerHTML = "";
 }
 
 function updateContact() {
