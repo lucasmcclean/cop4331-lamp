@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Console — COP 4331 Contacts Manager</title>
+    <title>Admin Page</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,32 +19,27 @@
         document.addEventListener('DOMContentLoaded', function () {
             readCookie();
             checkAdminAccess();
-        }, false);
-    </script>
+        }, false);</script>
 </head>
 <body class="py-4 py-md-5">
     <div class="background-glow"></div>
     <main class="container">
         <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-9">
+            <div class="col-12 col-md-10 col-lg-8">
 
                 <!-- Header / User Bar -->
                 <div class="d-flex flex-column flex-md-row align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary-subtle gap-3">
                     <div class="d-flex align-items-center gap-3">
                         <div class="app-icon-wrapper-sm">
-                            <i class="bi bi-shield-lock-fill"></i>
+                            <i class="bi bi-person-lines-fill"></i>
                         </div>
-                        <div>
-                            <h1 class="h3 fw-bold mb-0">Admin Console</h1>
-                            <small class="text-secondary-contrast">User &amp; account management</small>
-                        </div>
+                        <h1 id="title" class="h3 fw-bold mb-0">Admin User Page</h1>
                     </div>
 
+                    <!-- Logged In User Info & Logout Button -->
                     <div id="loggedInDiv" class="d-flex align-items-center gap-3 px-3 py-2 rounded-pill" style="background-color: #f8f1e3; border: 1px solid #d8cdb8;">
+
                         <span id="userName" class="small fw-medium text-body"></span>
-                        <a href="ContactManager.html" class="btn btn-sm btn-outline-success rounded-pill px-3">
-                            <i class="bi bi-arrow-left me-1"></i> My Contacts
-                        </a>
                         <button type="button" id="logoutButton" class="buttons btn btn-outline-danger btn-sm rounded-pill px-3" onclick="doLogout();">
                             <i class="bi bi-box-arrow-right me-1"></i> Log Out
                         </button>
@@ -52,190 +47,181 @@
                 </div>
 
                 <!-- Shown until the server confirms admin rights -->
-                <div id="adminAccessResult" class="text-start small fw-semibold mb-3"></div>
+                <div id="adminAccessResult" class="mb-3"></div>
 
-                <div id="adminConsole" class="d-none">
-                    <div class="card glass-card shadow-lg border-0 p-4 p-md-5">
-                        <div class="card-body p-0">
-                            <h2 class="h5 fw-bold mb-4 d-flex align-items-center gap-2" style="color: #14532d;">
-                                <i class="bi bi-people" style="color: #14532d;"></i> User Management
-                            </h2>
+                <!-- Access UI Card -->
+                <div id="adminConsole" class="card glass-card shadow-lg border-0 p-4 p-md-5 d-none">
+                    <div class="card-body p-0">
+                        <h2 class="h5 fw-bold mb-4 d-flex align-items-center gap-2" style="color: #14532d;">
+                            <i class="bi bi-person-vcard" style="color: #14532d;"></i> Contacts & User Manager
+                        </h2>
 
-                            <!-- Search Users -->
-                            <div class="section-card p-4 rounded-4 border mb-4">
-                                <label for="searchUsersValue" class="form-label form-label-contrast small text-uppercase mb-3">
+
+
+                        <!-- Search Users Section -->
+                        <div class="section-card p-4 rounded-4 border mb-4">
+                            <label for="searchUsersText" class="form-label form-label-contrast small text-uppercase">Search Users</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search text-secondary-contrast"></i></span>
+                                <input type="text" id="searchUsersText" class="form-control" placeholder="Name, login, or user ID" onkeyup="if(event.key === 'Enter') searchUsers();" />
+                                <button type="button" id="searchUsersButton" class="buttons btn btn-success px-4 fw-semibold" onclick="searchUsers();">
                                     Search Users
-                                </label>
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-search text-secondary-contrast"></i></span>
-                                            <input type="text" id="searchUsersValue" class="form-control"
-                                                   placeholder="Name, login, or user ID"
-                                                   onkeyup="if(event.key === 'Enter') searchUsers();" />
-                                            <button type="button" class="buttons btn btn-success px-4 fw-semibold"
-                                                    onclick="searchUsers();">
-                                                Search
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-start" id="userSearchResult"></div>
+                                </button>
                             </div>
-
-                            <!-- View a user's entries -->
-                            <div class="section-card p-4 rounded-4 border mb-4">
-                                <label class="form-label form-label-contrast small text-uppercase mb-3">
-                                    View a User's Entries
-                                </label>
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-4">
-                                        <label for="viewUserId" class="form-label form-label-contrast small">User ID</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
-                                            <input type="text" id="viewUserId" class="form-control" placeholder="Enter user ID" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-8">
-                                        <label for="viewContactsSearch" class="form-label form-label-contrast small">
-                                            Search
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-search text-secondary-contrast"></i></span>
-                                            <input type="text" id="viewContactsSearch" class="form-control"
-                                                   placeholder="Search name, email, phone, or contact ID" />
-                                            <button type="button" class="buttons btn btn-success px-4 fw-semibold"
-                                                    onclick="viewUserContacts();">
-                                                View Entries
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-start" id="userContactsResult"></div>
+                            <div class="mt-3">
+                                <div id="userList" class="mt-2 d-flex flex-wrap gap-2"></div>
+                                <span id="userToggleResult" class="small fw-semibold"></span>
                             </div>
-
-                            <!-- Enable / disable -->
-                            <div class="section-card p-4 rounded-4 border mb-4">
-                                <label class="form-label form-label-contrast small text-uppercase mb-3">
-                                    Enable / Disable a User
-                                </label>
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-4">
-                                        <label for="toggleUserId" class="form-label form-label-contrast small">User ID</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
-                                            <input type="text" id="toggleUserId" class="form-control" placeholder="Enter user ID" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <label for="toggleUserEnabled" class="form-label form-label-contrast small">Status</label>
-                                        <select id="toggleUserEnabled" class="form-select">
-                                            <option value="">Choose a status</option>
-                                            <option value="1">Enabled</option>
-                                            <option value="0">Disabled</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-md-4 d-flex align-items-end">
-                                        <button type="button" class="buttons btn btn-warning fw-semibold w-100"
-                                                onclick="toggleUserEnabled();">
-                                            <i class="bi bi-toggle-on me-2"></i> Apply Status
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-start" id="userToggleResult"></div>
-                            </div>
-
-                            <!-- Change a user's password -->
-                            <div class="section-card p-4 rounded-4 border mb-4">
-                                <label class="form-label form-label-contrast small text-uppercase mb-3">
-                                    Change a User's Password
-                                </label>
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-4">
-                                        <label for="passwordUserId" class="form-label form-label-contrast small">User ID</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
-                                            <input type="text" id="passwordUserId" class="form-control" placeholder="Enter user ID" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <label for="newUserPassword" class="form-label form-label-contrast small">New Password</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-key text-secondary-contrast"></i></span>
-                                            <input type="password" id="newUserPassword" class="form-control" placeholder="Enter new password" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-4 d-flex align-items-end">
-                                        <button type="button" class="buttons btn btn-success fw-semibold w-100"
-                                                onclick="changeUserPassword();">
-                                            <i class="bi bi-key me-2"></i> Update Password
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-start" id="userPasswordResult"></div>
-                            </div>
-
-                            <!-- Create user / admin -->
-                            <div class="section-card p-4 rounded-4 border">
-                                <label class="form-label form-label-contrast small text-uppercase mb-3">
-                                    Create a User or Admin Account
-                                </label>
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <label for="newUserFirstName" class="form-label form-label-contrast small">First Name</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
-                                            <input type="text" id="newUserFirstName" class="form-control" placeholder="Enter first name" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label for="newUserLastName" class="form-label form-label-contrast small">Last Name</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
-                                            <input type="text" id="newUserLastName" class="form-control" placeholder="Enter last name" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label for="newUserLogin" class="form-label form-label-contrast small">Username</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person-lines-fill text-secondary-contrast"></i></span>
-                                            <input type="text" id="newUserLogin" class="form-control" placeholder="Enter login" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label for="newUserAccountPassword" class="form-label form-label-contrast small">Password</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-lock text-secondary-contrast"></i></span>
-                                            <input type="password" id="newUserAccountPassword" class="form-control" placeholder="Enter password" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" id="newUserIsAdmin" />
-                                            <label class="form-check-label" for="newUserIsAdmin">
-                                                Grant Admin privileges
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" id="newUserIsEnabled" checked />
-                                            <label class="form-check-label" for="newUserIsEnabled">
-                                                Account is enabled
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="button" class="buttons btn btn-success px-4 fw-semibold w-100"
-                                                onclick="createAdminUser();">
-                                            <i class="bi bi-person-add me-2"></i> Create Account
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-start" id="createUserResult"></div>
-                            </div>
-
                         </div>
+
+
+
+
+                        <!-- Search Contacts Section -->
+                        <div class="section-card p-4 rounded-4 border mb-4">
+                            <label for="adminContactsSearch" class="form-label form-label-contrast small text-uppercase">User Entries</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search text-secondary-contrast"></i></span>
+                                <input type="text" id="adminContactsSearch" class="form-control" placeholder="Search this user's name, email, phone, or contact ID" />
+                                <button type="button" class="buttons btn btn-success px-4 fw-semibold" onclick="adminSearchContacts(this);">
+                                    Search
+                                </button>
+                            </div>
+                            <div class="mt-3">
+                                <div id="contactSearchResultAdmin" class="mt-2 d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Update Password Section -->
+                        <div class="section-card p-4 rounded-4 border mb-4">
+                            <label for="newPW" class="form-label form-label-contrast small text-uppercase mb-3">
+                                Change a User's Password
+                            </label>
+
+                            <p class="small mb-3">
+                                Enter the new password below, then press the key icon on the user you want
+                                to change it for.
+                            </p>
+
+                            <div class="row g-3">
+
+                                <!-- New password -->
+                                <div class="col-md-6">
+                                    <label for="newPW" class="form-label form-label-contrast small">
+                                        New Password
+                                    </label>
+
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-key text-secondary-contrast"></i></span>
+                                        <input type="password" id="newPW" class="form-control" placeholder="Enter new password" />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="mt-3 text-start">
+                                <span id="passwordUpdateResult" class="small fw-semibold"></span>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Create User Section -->
+                        <div class="section-card p-4 rounded-4 border">
+                            <label class="form-label form-label-contrast small text-uppercase mb-3">
+                                Create New User
+                            </label>
+
+                            <div class="row g-3">
+
+                                <!-- First Name -->
+                                <div class="mb-4">
+                                    <label for="userFirstName" class="form-label form-label-contrast small">First Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge text-secondary-contrast"></i></span>
+                                        <input type="text" id="userFirstName" class="form-control" placeholder="Enter first name" required />
+                                    </div>
+                                </div>
+
+
+
+
+                                <!-- Last Name -->
+                                <div class="mb-4">
+                                    <label for="userLastName" class="form-label form-label-contrast small">Last Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-badge-fill text-secondary-contrast"></i></span>
+                                        <input type="text" id="userLastName" class="form-control" placeholder="Enter last name" required />
+                                    </div>
+                                </div>
+
+
+                                <!-- Username -->
+                                <div class="mb-4">
+                                    <label for="userUserName" class="form-label form-label-contrast small">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-vcard text-secondary-contrast"></i></span>
+                                        <input type="text" id="userUserName" class="form-control" placeholder="Enter username" required />
+                                    </div>
+                                </div>
+
+
+                                <!-- Password -->
+                                <div class="mb-4">
+                                    <label for="userPW" class="form-label form-label-contrast small">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-lock-fill text-secondary-contrast"></i></span>
+                                        <input type="password" id="userPW" class="form-control" placeholder="Enter password" required />
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Admin Status -->
+                                <div class="mb-4">
+                                    <label for="adminStatus" class="form-label form-label-contrast small">Role</label>
+                                    <select id="adminStatus" class="form-select">
+                                        <option value="0">User</option>
+                                        <option value="1">Admin</option>
+                                    </select>
+                                </div>
+
+
+
+                                <!-- Enabled Status -->
+                                <div class="mb-4">
+                                    <label for="enabledStatus" class="form-label form-label-contrast small">Status</label>
+                                    <select id="enabledStatus" class="form-select">
+                                        <option value="1">Enabled</option>
+                                        <option value="0">Disabled</option>
+                                    </select>
+                                </div>
+
+
+
+
+
+                                <!-- Create User Button -->
+                                <div class="col-12">
+                                    <button type="button" id="createUserButton" class="buttons btn btn-success px-4 fw-semibold w-100" onclick="addUser();">
+                                        <i class="bi bi-person-add me-2"></i>
+                                        Add User
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 text-start">
+                                <span id="userAddResult" class="small fw-semibold"></span>
+                            </div>
+                        </div>
+
+
+
+
+
+
                     </div>
                 </div>
 
