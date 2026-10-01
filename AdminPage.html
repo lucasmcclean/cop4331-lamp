@@ -17,6 +17,26 @@
     <script type="text/javascript" src="js/code.js"></script>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
+            // js/code.js is served without a build step, so a browser can pair a
+            // cached older script with this newer page. When that happens the
+            // page was previously blank with no explanation. Fail loudly and
+            // point at the one action that fixes it.
+            if (typeof checkAdminAccess !== 'function' ||
+                checkAdminAccess.length < 1 ||
+                typeof updatePassword !== 'function' ||
+                updatePassword.length !== 0) {
+                var warn = document.getElementById('assetVersionWarning');
+                if (warn) {
+                    warn.className = 'alert alert-danger mb-3 py-2 small fw-semibold';
+                    warn.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> ' +
+                        'This page is running an outdated cached copy of js/code.js. ' +
+                        'Press Ctrl+Shift+R (Cmd+Shift+R on a Mac) to hard-reload.';
+                }
+                var console_ = document.getElementById('adminConsole');
+                if (console_) console_.classList.add('d-none');
+                return;
+            }
+
             readCookie();
             checkAdminAccess(function () { searchUsers(); });
         }, false);</script>
@@ -48,6 +68,9 @@
 
                 <!-- Shown until the server confirms admin rights -->
                 <div id="adminAccessResult" class="mb-3"></div>
+
+                <!-- Shown only when js/code.js does not match this page -->
+                <div id="assetVersionWarning" class="d-none"></div>
 
                 <!-- Access UI Card -->
                 <div id="adminConsole" class="card glass-card shadow-lg border-0 p-4 p-md-5 d-none">

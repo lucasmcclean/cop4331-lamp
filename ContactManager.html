@@ -17,6 +17,22 @@
     <script type="text/javascript" src="js/code.js"></script>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
+            // A cached older js/code.js paired with this newer page fails in
+            // confusing ways, so say so instead of rendering a dead page.
+            if (typeof editContact !== 'function' ||
+                typeof updateContact !== 'function') {
+                var warn = document.getElementById('assetVersionWarning');
+                if (warn) {
+                    warn.className = 'alert alert-danger mb-3 py-2 small fw-semibold';
+                    warn.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> ' +
+                        'This page is running an outdated cached copy of js/code.js. ' +
+                        'Press Ctrl+Shift+R (Cmd+Shift+R on a Mac) to hard-reload.';
+                }
+                var access = document.getElementById('accessUIDiv');
+                if (access) access.classList.add('d-none');
+                return;
+            }
+
             readCookie();
             searchContacts();
         }, false);</script>
@@ -46,8 +62,11 @@
                     </div>
                 </div>
 
-                <!-- Access UI Card -->
-                <div id="accessUIDiv" class="card glass-card shadow-lg border-0 p-4 p-md-5">
+<!-- Shown only when js/code.js does not match this page -->
+                    <div id="assetVersionWarning" class="d-none"></div>
+
+                    <!-- Access UI Card -->
+                    <div id="accessUIDiv" class="card glass-card shadow-lg border-0 p-4 p-md-5">
                     <div class="card-body p-0">
                         <h2 class="h5 fw-bold mb-4 d-flex align-items-center gap-2" style="color: #14532d;">
                             <i class="bi bi-person-vcard" style="color: #14532d;"></i> Contact Manager
