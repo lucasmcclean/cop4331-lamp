@@ -70,6 +70,25 @@ function rowData(el, selector) {
   return row ? row.dataset : null;
 }
 
+// The API accepts exactly 10 digits with an optional leading "+". People type
+// "(555) 123-4567" or "555-123-4567", which the server rejected outright, so
+// saving an edit failed with "Invalid phone number" for a reason the form gave
+// no hint about. Strip formatting here so normal input just works.
+function normalizePhone(raw) {
+  let s = String(raw).trim();
+  let plus = s.charAt(0) === "+" ? "+" : "";
+  let digits = s.replace(/\D/g, "");
+
+  // Drop a leading US country code so "+1 (555) 123-4567" still resolves.
+  if (digits.length === 11 && digits.charAt(0) === "1") digits = digits.slice(1);
+
+  return plus + digits;
+}
+
+function phoneLooksValid(phone) {
+  return /^\+?[0-9]{10}$/.test(phone);
+}
+
 // ============================================================
 //  Session
 // ============================================================
@@ -237,7 +256,7 @@ function addContact() {
   let first = field("firstName");
   let last = field("lastName");
   let email = field("emailAdd");
-  let phone = field("phoneNum");
+  let phone = normalizePhone(field("phoneNum"));
   let resultEl = document.getElementById("contactAddResult");
   resultEl.innerHTML = "";
 
@@ -245,6 +264,15 @@ function addContact() {
     setMessage(
       resultEl,
       "<i class='bi bi-exclamation-triangle-fill me-1'></i> Please enter all required information",
+      false
+    );
+    return;
+  }
+
+  if (!phoneLooksValid(phone)) {
+    setMessage(
+      resultEl,
+      "<i class='bi bi-exclamation-triangle-fill me-1'></i> Phone number must be 10 digits, e.g. 555-123-4567",
       false
     );
     return;
@@ -297,8 +325,11 @@ function searchContacts() {
 
       if (contacts.length === 0) {
         resultEl.innerHTML = "<span class='text-warning'>No contacts found</span>";
+        clearStaleEditTarget(contacts);
         return;
       }
+
+      clearStaleEditTarget(contacts);
 
       resultEl.innerHTML = contacts
         .map(
@@ -352,6 +383,33 @@ function editContact(el) {
     "<i class='bi bi-pencil-square me-1'></i> Editing contact " + escapeHtml(c.id);
 }
 
+// Searching replaced the results list but left the loaded contact in the edit
+// form with Save still enabled, so a later save silently rewrote a contact that
+// was no longer on screen. Drop the selection when it is not in the new list.
+function clearStaleEditTarget(contacts) {
+  let loaded = field("editContactId");
+  if (!loaded) return;
+
+  let stillVisible = contacts.some(
+    (c) => String(c.id) === String(loaded)
+  );
+
+  if (stillVisible) return;
+
+  resetEditForm();
+
+  let resultEl = document.getElementById("contactUpdateResult");
+  if (resultEl) {
+    setMessage(
+      resultEl,
+      "<i class='bi bi-info-circle me-1'></i> Contact " +
+        escapeHtml(loaded) +
+        " is no longer in the results, so it was unloaded",
+      false
+    );
+  }
+}
+
 function resetEditForm() {
   clearFields(
     "editContactId",
@@ -367,7 +425,7 @@ function updateContact() {
   let id = field("editContactId");
   let first = field("editFirstName");
   let last = field("editLastName");
-  let phone = field("editPhone");
+  let phone = normalizePhone(field("editPhone"));
   let email = field("editEmail");
   let resultEl = document.getElementById("contactUpdateResult");
   resultEl.innerHTML = "";
@@ -385,6 +443,15 @@ function updateContact() {
     setMessage(
       resultEl,
       "<i class='bi bi-exclamation-triangle-fill me-1'></i> All fields are required",
+      false
+    );
+    return;
+  }
+
+  if (!phoneLooksValid(phone)) {
+    setMessage(
+      resultEl,
+      "<i class='bi bi-exclamation-triangle-fill me-1'></i> Phone number must be 10 digits, e.g. 555-123-4567",
       false
     );
     return;
@@ -458,7 +525,7 @@ function deleteContact(el) {
 //  re-checks Admin = 1 AND Enabled = 1 on every request.
 // ============================================================
 
-function checkAdminAccess() {
+function checkAdminAccess(onGranted) {
   let resultEl = document.getElementById("adminAccessResult");
   if (!resultEl) return;
 
@@ -470,6 +537,10 @@ function checkAdminAccess() {
 
     if (this.status === 200) {
       document.getElementById("adminConsole").classList.remove("d-none");
+
+      // Populate the user list once access is confirmed. Leaving it empty until
+      // the admin typed a query made the console look broken on arrival.
+      if (typeof onGranted === "function") onGranted();
       return;
     }
 
@@ -505,6 +576,10 @@ function searchUsers() {
     let users = JSON.parse(this.responseText).users || [];
     resultEl.className = "mt-2 d-flex flex-wrap gap-2";
 
+    // The selected password target lives on a row that may just have been
+    // re-rendered, so the reference is stale after any refresh.
+    clearPasswordTarget();
+
     if (users.length === 0) {
       resultEl.innerHTML =
         "<div class='small italic py-2'><i class='bi bi-info-circle me-1'></i> No matching users found.</div>";
@@ -515,14 +590,17 @@ function searchUsers() {
       .map(
         (u) => `<span class="badge bg-body-tertiary text-body border border-success px-3 py-2 fs-6 d-inline-flex align-items-center gap-2"
                       data-user data-id="${escapeHtml(String(u.id))}"
-                      data-enabled="${escapeHtml(String(u.enabled))}">
+                      data-enabled="${escapeHtml(String(u.enabled))}"
+                      data-first="${escapeHtml(u.firstName)}"
+                      data-last="${escapeHtml(u.lastName)}"
+                      data-login="${escapeHtml(u.login)}">
                   <span>${escapeHtml(u.firstName)} ${escapeHtml(u.lastName)}</span>
                   <span>${escapeHtml(u.login)}</span>
                   <span>${u.admin == 1 ? "Admin" : "User"}</span>
                   <span>${u.enabled == 1 ? "Enabled" : "Disabled"}</span>
 
                   <button type="button" class="btn btn-sm btn-outline-success"
-                          onclick="updatePassword(this);" title="Change Password">
+                          onclick="selectPasswordTarget(this);" title="Change this user's password">
                     <i class="bi bi-key"></i>
                   </button>
 
@@ -565,7 +643,11 @@ function toggleEnable(el) {
     if (this.status === 200) {
       setMessage(
         resultEl,
-        "<i class='bi bi-check-circle-fill me-1'></i> User is now " +
+        "<i class='bi bi-check-circle-fill me-1'></i> " +
+          escapeHtml(u.first + " " + u.last) +
+          " (" +
+          escapeHtml(u.login) +
+          ") is now " +
           (next === 1 ? "enabled" : "disabled"),
         true
       );
@@ -578,13 +660,66 @@ function toggleEnable(el) {
   xhr.send(JSON.stringify({ enabled: next }));
 }
 
-function updatePassword(el) {
+// The old flow asked the admin to type a password into a box far above the user
+// list and then click a key icon on the row they meant. Nothing in the UI said
+// which user was selected, and the success message never named them, so it was
+// easy to reset the wrong account. The key button now records the target and
+// names it on screen, and the save button acts on that recorded target.
+let passwordTarget = null;
+
+function selectPasswordTarget(el) {
   let u = rowData(el, "[data-user]");
   if (!u) return;
 
-  let password = field("newPW");
+  passwordTarget = u;
+
+  let nameEl = document.getElementById("passwordTargetName");
+  if (nameEl) {
+    nameEl.innerHTML =
+      "<i class='bi bi-person-check me-1'></i> Changing password for <strong>" +
+escapeHtml(u.first + " " + u.last) +
+          "</strong> (login: " +
+      escapeHtml(u.login) +
+      ")";
+  }
+
+  document.querySelectorAll("[data-user]").forEach((row) => {
+    row.classList.toggle("border-success", row === el.closest("[data-user]"));
+    row.classList.toggle("border", row !== el.closest("[data-user]"));
+  });
+
+  let resultEl = document.getElementById("passwordUpdateResult");
+  if (resultEl) resultEl.innerHTML = "";
+
+  let newPw = document.getElementById("newPW");
+  if (newPw) newPw.focus();
+}
+
+function clearPasswordTarget() {
+  passwordTarget = null;
+
+  let nameEl = document.getElementById("passwordTargetName");
+  if (nameEl) nameEl.innerHTML = "";
+
+  document
+    .querySelectorAll("[data-user]")
+    .forEach((row) => row.classList.remove("border-success"));
+}
+
+function updatePassword() {
   let resultEl = document.getElementById("passwordUpdateResult");
   resultEl.innerHTML = "";
+
+  if (!passwordTarget) {
+    setMessage(
+      resultEl,
+      "<i class='bi bi-exclamation-triangle-fill me-1'></i> Choose a user first by clicking the key icon on their row",
+      false
+    );
+    return;
+  }
+
+  let password = field("newPW");
 
   if (!password) {
     setMessage(
@@ -600,7 +735,7 @@ function updatePassword(el) {
     "PUT",
     urlBase +
       "?action=admin&operation=passwordUpdate&id=" +
-      encodeURIComponent(u.id),
+      encodeURIComponent(passwordTarget.id),
     true
   );
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
@@ -609,12 +744,18 @@ function updatePassword(el) {
     if (this.readyState !== 4) return;
 
     if (this.status === 200 || this.status === 201) {
+      let changed = passwordTarget.first + " " + passwordTarget.last;
       setMessage(
         resultEl,
-        "<i class='bi bi-check-circle-fill me-1'></i> Password successfully updated",
+        "<i class='bi bi-check-circle-fill me-1'></i> Password updated for " +
+          escapeHtml(changed) +
+          " (login: " +
+          escapeHtml(passwordTarget.login) +
+          ")",
         true
       );
       clearFields("newPW");
+      clearPasswordTarget();
     } else {
       showApiError(this, resultEl, "Failed to update password");
     }

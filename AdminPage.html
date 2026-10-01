@@ -18,7 +18,7 @@
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
             readCookie();
-            checkAdminAccess();
+            checkAdminAccess(function () { searchUsers(); });
         }, false);</script>
 </head>
 <body class="py-4 py-md-5">
@@ -96,14 +96,16 @@
 
                         <!-- Update Password Section -->
                         <div class="section-card p-4 rounded-4 border mb-4">
-                            <label for="newPW" class="form-label form-label-contrast small text-uppercase mb-3">
+                            <label class="form-label form-label-contrast small text-uppercase mb-3">
                                 Change a User's Password
                             </label>
 
                             <p class="small mb-3">
-                                Enter the new password below, then press the key icon on the user you want
-                                to change it for.
+                                Click the <i class="bi bi-key"></i> key icon on the user you want to change,
+                                then enter the new password and press Save Password.
                             </p>
+
+                            <div id="passwordTargetName" class="small fw-semibold mb-3"></div>
 
                             <div class="row g-3">
 
@@ -115,8 +117,16 @@
 
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-key text-secondary-contrast"></i></span>
-                                        <input type="password" id="newPW" class="form-control" placeholder="Enter new password" />
+                                        <input type="password" id="newPW" class="form-control" placeholder="Enter new password"
+                                            onkeyup="if(event.key === 'Enter') updatePassword();" />
                                     </div>
+                                </div>
+
+                                <div class="col-md-6 d-flex align-items-end">
+                                    <button type="button" id="savePasswordButton" class="buttons btn btn-success px-4 fw-semibold w-100" onclick="updatePassword();">
+                                        <i class="bi bi-check-lg me-2"></i>
+                                        Save Password
+                                    </button>
                                 </div>
 
                             </div>
