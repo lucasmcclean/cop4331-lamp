@@ -165,8 +165,10 @@ body {
 }
 
 /* The "Logged in as <name>" label sat inside a narrow pill next to the Log Out
-   button and wrapped onto three lines for a typical name. Keep it on one line
-   and let the pill grow instead of stacking the text. */
-#userName {
+   button and wrapped onto three lines for a typical name. The button's own
+   label wrapped too when the pill got tight. Keep both on one line and let the
+   pill grow instead of stacking the text. */
+#userName,
+#logoutButton {
   white-space: nowrap;
 }
