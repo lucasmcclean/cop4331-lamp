@@ -75,6 +75,28 @@ body {
   color: #c62828 !important;
 }
 
+.text-warning {
+  color: #94600b !important;
+}
+
+/* Bootstrap's outline button colors (#dc3545 / #198754 / #ffc107) fall just
+   under 4.5:1 against this page's cream backgrounds. Redefining the custom
+   properties here darkens the label without touching the markup. */
+.btn-outline-danger {
+  --bs-btn-color: #b02a37;
+  --bs-btn-border-color: #b02a37;
+}
+
+.btn-outline-success {
+  --bs-btn-color: #157347;
+  --bs-btn-border-color: #157347;
+}
+
+.btn-outline-warning {
+  --bs-btn-color: #94600b;
+  --bs-btn-border-color: #94600b;
+}
+
 
 .form-control,
 .input-group-text {
@@ -84,7 +106,7 @@ body {
 }
 
 .form-control::placeholder {
-  color: rgba(40, 55, 40, 0.5) !important;
+  color: rgba(40, 55, 40, 0.75) !important;
 }
 
 .input-group-text {
